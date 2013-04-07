@@ -8,12 +8,13 @@ struct dfont_rect {
 	int y;
 	int w;
 	int h;
+	int offx;
 };
 
 struct dfont * dfont_create(int width, int height);
 void dfont_release(struct dfont *);
 const struct dfont_rect * dfont_lookup(struct dfont *, int c, int height);
-const struct dfont_rect * dfont_insert(struct dfont *, int c, int width, int height);
+const struct dfont_rect * dfont_insert(struct dfont *, int c, int width, int height,int offx);
 void dfont_flush(struct dfont *);
 void dfont_dump(struct dfont *); // for debug
 
