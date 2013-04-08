@@ -272,7 +272,7 @@ insert_char(struct dfont *df, int c, struct hash_rect *hr) {
 }
 
 const struct dfont_rect * 
-dfont_insert(struct dfont *df, int c, int width, int height, int offx) {
+dfont_insert(struct dfont *df, int c, int width, int height) {
 	if (width > df->width)
 		return NULL;
 	assert(dfont_lookup(df,c,height) == NULL);
@@ -282,13 +282,11 @@ dfont_insert(struct dfont *df, int c, int width, int height, int offx) {
 			break;
 		struct hash_rect * hr = find_space(df, line, width);
 		if (hr) {
-			hr->rect.offx = offx;
 			return insert_char(df,c,hr);
 		}
 	}
 	struct hash_rect * hr = release_space(df, width, height);
 	if (hr) {
-		hr->rect.offx = offx;
 		return insert_char(df,c,hr);
 	}
 	return NULL;
