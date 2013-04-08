@@ -16,6 +16,7 @@ struct hash_rect {
 	int version;
 	int c;
 	int line;
+	int font;
 	struct dfont_rect rect;
 };
 
@@ -84,11 +85,11 @@ dfont_flush(struct dfont *df) {
 }
 
 const struct dfont_rect * 
-dfont_lookup(struct dfont *df, int c, int height) {
-	int h = hash(c, height);
+dfont_lookup(struct dfont *df, int c, int font) {
+	int h = hash(c, font);
 	struct hash_rect *hr = df->hash[h];
 	while (hr) {
-		if (hr->c == c && hr->rect.h == height) {
+		if (hr->c == c && hr->font == font) {
 			list_move(&hr->time, &df->time);
 			hr->version = df->version;
 			return &(hr->rect);
@@ -261,8 +262,9 @@ release_space(struct dfont *df, int width, int height) {
 }
 
 static struct dfont_rect *
-insert_char(struct dfont *df, int c, struct hash_rect *hr) {
+insert_char(struct dfont *df, int c, int font, struct hash_rect *hr) {
 	hr->c = c;
+	hr->font = font;
 	hr->version = df->version;
 	list_add_tail(&hr->time, &df->time);
 	int h = hash(c, hr->rect.h);
@@ -272,29 +274,29 @@ insert_char(struct dfont *df, int c, struct hash_rect *hr) {
 }
 
 const struct dfont_rect * 
-dfont_insert(struct dfont *df, int c, int width, int height) {
+dfont_insert(struct dfont *df, int c, int font, int width, int height) {
 	if (width > df->width)
 		return NULL;
-	assert(dfont_lookup(df,c,height) == NULL);
+	assert(dfont_lookup(df,c,font) == NULL);
 	for (;;) {
 		struct font_line *line = find_line(df, width, height);
 		if (line == NULL)
 			break;
 		struct hash_rect * hr = find_space(df, line, width);
 		if (hr) {
-			return insert_char(df,c,hr);
+			return insert_char(df,c,font,hr);
 		}
 	}
 	struct hash_rect * hr = release_space(df, width, height);
 	if (hr) {
-		return insert_char(df,c,hr);
+		return insert_char(df,c,font,hr);
 	}
 	return NULL;
 }
 
 static void
 dump_node(struct hash_rect *hr) {
-	printf("(%d : %d %d %d %d) ", hr->c, hr->rect.x, hr->rect.y, hr->rect.w, hr->rect.h);
+	printf("(%d/%d : %d %d %d %d) ", hr->c, hr->font, hr->rect.x, hr->rect.y, hr->rect.w, hr->rect.h);
 }
 
 void 
