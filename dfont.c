@@ -243,7 +243,7 @@ release_space(struct dfont *df, int width, int height) {
 	struct hash_rect *hr, *tmp;
 	list_for_each_entry_safe(hr, tmp, &df->time, time) {
 		if (hr->version == df->version)
-			return NULL;
+			continue;
 		if (hr->rect.h != height) {
 			continue;
 		}
